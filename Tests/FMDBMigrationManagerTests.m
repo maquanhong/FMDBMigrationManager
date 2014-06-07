@@ -84,6 +84,20 @@ static FMDatabase *FMDatabaseWithSchemaMigrationsTable()
 
 @implementation FMDBMigrationManagerTests
 
++ (void)setUp
+{
+    NSString *applicationDataDirectory = FMDBApplicationDataDirectory();
+    BOOL isDirectory;
+    if ([[NSFileManager defaultManager] fileExistsAtPath:applicationDataDirectory isDirectory:&isDirectory]) {
+        if (!isDirectory) [NSException raise:NSInternalInconsistencyException format:@"Cannot execute tests: expected to find directory at path returned by `FMDBApplicationDataDirectory()`, but instead found a file. (%@)", applicationDataDirectory];
+    } else {
+        NSError *error = nil;
+        if (![[NSFileManager defaultManager] createDirectoryAtPath:applicationDataDirectory withIntermediateDirectories:YES attributes:nil error:&error]) {
+            [NSException raise:NSInternalInconsistencyException format:@"Cannot execute tests: failed while attempting to create path returned by `FMDBApplicationDataDirectory()`: %@ (%@)", error, applicationDataDirectory];
+        }
+    }
+}
+
 - (void)testHasMigrationTableWhenTableDoesntExist
 {
     FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:FMDBRandomDatabasePath() migrationsBundle:FMDBMigrationsTestBundle()];
