@@ -264,4 +264,32 @@ static FMDatabase *FMDatabaseWithSchemaMigrationsTable()
     expect(manager.currentVersion).to.equal(201406063106474);
 }
 
+- (void)testFMDBIsMigrationAtPath
+{
+    expect(FMDBIsMigrationAtPath(@"1.sql")).to.beTruthy();
+    expect(FMDBIsMigrationAtPath(@"12345.sql")).to.beTruthy();
+    expect(FMDBIsMigrationAtPath(@"999999999999999.sql")).to.beTruthy();
+    expect(FMDBIsMigrationAtPath(@"12345_name.sql")).to.beTruthy();
+    expect(FMDBIsMigrationAtPath(@"12345_ThisIsAlsoValid.sql")).to.beTruthy();
+    expect(FMDBIsMigrationAtPath(@"12345_This Is Also Valid.sql")).to.beTruthy();
+    expect(FMDBIsMigrationAtPath(@"12345_ChangeToMaximumOf5Users.sql")).to.beTruthy();
+    
+    // Negative cases
+    expect(FMDBIsMigrationAtPath(@"a1.sql")).to.beFalsy();
+    expect(FMDBIsMigrationAtPath(@"the_schema.sql")).to.beFalsy();
+    expect(FMDBIsMigrationAtPath(@"the_schema")).to.beFalsy();
+    expect(FMDBIsMigrationAtPath(@"the_schema")).to.beFalsy();
+    expect(FMDBIsMigrationAtPath(@"12345_.sql")).to.beFalsy();
+    expect(FMDBIsMigrationAtPath(@"12345dfsf.sql")).to.beFalsy();
+}
+
+- (void)testMigrationsFromBundleWithAlternateFileNames
+{
+    NSBundle *parentBundle = [NSBundle bundleForClass:NSClassFromString(@"FMDBMigrationManagerTests")];
+    NSBundle *alternateNamesBundle = [NSBundle bundleWithPath:[parentBundle pathForResource:@"AlternateNamedMigrations" ofType:@"bundle"]];
+    FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:FMDBRandomDatabasePath() migrationsBundle:alternateNamesBundle];
+    expect([manager.migrations valueForKey:@"name"]).to.equal(@[ @"CamelCaseShouldWork", [NSNull null], @"This Is Another Name", @"My Object Migration" ]);
+    expect([manager.migrations valueForKey:@"version"]).to.equal(@[ @2, @12345, @201406063548463, @201499000000000 ]);
+}
+
 @end

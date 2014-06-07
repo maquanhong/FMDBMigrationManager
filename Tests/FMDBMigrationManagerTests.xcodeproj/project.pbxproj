@@ -12,6 +12,8 @@
 		25D1D1DA1943936F004D1098 /* FMDBMigrationManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 25FFD172194255D400F62FAF /* FMDBMigrationManagerTests.m */; };
 		25D9260C194396A4000FDB83 /* Migrations.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 25D9260B194396A4000FDB83 /* Migrations.bundle */; };
 		25D9260D194396A4000FDB83 /* Migrations.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 25D9260B194396A4000FDB83 /* Migrations.bundle */; };
+		25D926131943C20A000FDB83 /* AlternateNamedMigrations.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 25D926121943C20A000FDB83 /* AlternateNamedMigrations.bundle */; };
+		25D926141943C20A000FDB83 /* AlternateNamedMigrations.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 25D926121943C20A000FDB83 /* AlternateNamedMigrations.bundle */; };
 		25FFD14D1942553B00F62FAF /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25FFD14C1942553B00F62FAF /* XCTest.framework */; };
 		25FFD14F1942553B00F62FAF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25FFD14E1942553B00F62FAF /* Foundation.framework */; };
 		25FFD1511942553B00F62FAF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25FFD1501942553B00F62FAF /* UIKit.framework */; };
@@ -23,6 +25,7 @@
 		2300108E74444446931093DD /* libPods-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		25D1D1CC1943935F004D1098 /* OS X Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OS X Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		25D9260B194396A4000FDB83 /* Migrations.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Migrations.bundle; sourceTree = "<group>"; };
+		25D926121943C20A000FDB83 /* AlternateNamedMigrations.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AlternateNamedMigrations.bundle; sourceTree = "<group>"; };
 		25FFD1491942553B00F62FAF /* iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		25FFD14C1942553B00F62FAF /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		25FFD14E1942553B00F62FAF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -64,6 +67,7 @@
 			children = (
 				25FFD172194255D400F62FAF /* FMDBMigrationManagerTests.m */,
 				25D9260B194396A4000FDB83 /* Migrations.bundle */,
+				25D926121943C20A000FDB83 /* AlternateNamedMigrations.bundle */,
 				25FFD173194255D400F62FAF /* Info.plist */,
 				25FFD174194255D400F62FAF /* Prefix.pch */,
 				25FFD14B1942553B00F62FAF /* Frameworks */,
@@ -167,6 +171,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				25D9260D194396A4000FDB83 /* Migrations.bundle in Resources */,
+				25D926141943C20A000FDB83 /* AlternateNamedMigrations.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -175,6 +180,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				25D9260C194396A4000FDB83 /* Migrations.bundle in Resources */,
+				25D926131943C20A000FDB83 /* AlternateNamedMigrations.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -9,12 +9,14 @@
 #import "FMDBMigrationManager.h"
 #import <objc/runtime.h>
 
+static NSString *FMDBMigrationFilenameRegexString = @"^(\\d+)_?((?<=_)[\\w\\s-]+)?(?<!_)\\.sql$";
+
 BOOL FMDBIsMigrationAtPath(NSString *path)
 {
     static NSRegularExpression *migrationRegex;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        migrationRegex = [NSRegularExpression regularExpressionWithPattern:@"\\d{1,15}_.+sql$" options:0 error:nil];
+        migrationRegex = [NSRegularExpression regularExpressionWithPattern:FMDBMigrationFilenameRegexString options:0 error:nil];
     });
     NSString *filename = [path lastPathComponent];
     return [migrationRegex rangeOfFirstMatchInString:filename options:0 range:NSMakeRange(0, [filename length])].location != NSNotFound;
@@ -127,7 +129,7 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 - (NSArray *)migrations
 {
     NSArray *migrationPaths = [self.migrationsBundle pathsForResourcesOfType:@"sql" inDirectory:nil];
-    NSRegularExpression *migrationRegex = [NSRegularExpression regularExpressionWithPattern:@"\\d{15}_.+sql$" options:0 error:nil];
+    NSRegularExpression *migrationRegex = [NSRegularExpression regularExpressionWithPattern:FMDBMigrationFilenameRegexString options:0 error:nil];
     NSMutableArray *migrations = [NSMutableArray new];
     for (NSString *path in migrationPaths) {
         NSString *filename = [path lastPathComponent];
@@ -193,18 +195,19 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 static BOOL FMDBMigrationScanMetadataFromPath(NSString *path, uint64_t *version, NSString **name)
 {
     NSError *error = nil;
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"(\\d{15})_(.+)$" options:0 error:&error];
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:FMDBMigrationFilenameRegexString options:0 error:&error];
     if (!regex) {
         NSLog(@"[FMDBMigration] Failed constructing regex: %@", error);
         return NO;
     }
-    NSString *migrationName = [[path lastPathComponent] stringByDeletingPathExtension];
+    NSString *migrationName = [path lastPathComponent];
     NSTextCheckingResult *result = [regex firstMatchInString:migrationName options:0 range:NSMakeRange(0, [migrationName length])];
     if ([result numberOfRanges] != 3) return NO;
     NSString *versionString = [migrationName substringWithRange:[result rangeAtIndex:1]];
     NSScanner *scanner = [NSScanner scannerWithString:versionString];
     [scanner scanUnsignedLongLong:version];
-    *name = [migrationName substringWithRange:[result rangeAtIndex:2]];
+    NSRange range = [result rangeAtIndex:2];
+    *name = (range.length) ? [migrationName substringWithRange:[result rangeAtIndex:2]] : nil;
     return YES;
 }
 
