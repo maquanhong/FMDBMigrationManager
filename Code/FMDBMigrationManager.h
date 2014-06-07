@@ -59,7 +59,8 @@
 ///---------------------------
 
 /**
- @abstract Returns all migrations discoverable by the receiver. Each object returned conforms to the `FMDBMigrating` protocol.
+ @abstract Returns all migrations discoverable by the receiver. Each object returned conforms to the `FMDBMigrating` protocol. The
+ array is returned in ascending order by version.
  @discussion The manager discovers migrations by analyzing all files that end in a .sql extension in the `migrationsBundle`
  and accumulating all classes that conform to the `FMDBMigrating` protocol. These migrations can then be sorted and applied
  to the target database.
@@ -68,13 +69,13 @@
 
 /**
  @abstract Returns the version numbers of the subset of `migrations` that have already been applied to the database
- managed by the receiver.
+ managed by the receiver in ascending order.
  */
 @property (nonatomic, readonly) NSArray *appliedVersions;
 
 /**
  @abstract Returns the version numbers of the subset of `migrations` that have not yet been applied to the database
- managed by the receiver.
+ managed by the receiver in ascending order.
  */
 @property (nonatomic, readonly) NSArray *pendingVersions;
 

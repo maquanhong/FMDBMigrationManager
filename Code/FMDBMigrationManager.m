@@ -114,14 +114,14 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
         uint64_t version = [resultSet unsignedLongLongIntForColumnIndex:0];
         [versions addObject:@(version)];
     }
-    return versions;
+    return [versions sortedArrayUsingSelector:@selector(compare:)];
 }
 
 - (NSArray *)pendingVersions
 {
     NSMutableArray *pendingVersions = [[[self migrations] valueForKey:@"version"] mutableCopy];
     [pendingVersions removeObjectsInArray:self.appliedVersions];
-    return pendingVersions;
+    return [pendingVersions sortedArrayUsingSelector:@selector(compare:)];
 }
 
 - (NSArray *)migrations
@@ -144,7 +144,7 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
         id<FMDBMigrating> migration = [migrationClass new];
         [migrations addObject:migration];
     }
-    return migrations;
+    return [migrations sortedArrayUsingDescriptors:@[ [NSSortDescriptor sortDescriptorWithKey:@"version" ascending:YES] ]];
 }
 
 - (id<FMDBMigrating>)migrationForVersion:(uint64_t)version
