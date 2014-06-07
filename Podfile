@@ -1,5 +1,3 @@
-platform :ios, 5.0
-
 xcodeproj 'Tests/FMDBMigrationManagerTests'
 workspace 'FMDBMigrationManager'
 
@@ -9,13 +7,13 @@ def import_pods
 end
 
 target :ios do
-  platform :ios, '5.0'
+  platform :ios, '7.0'
   link_with 'iOS Tests'
   import_pods
 end
 
 target :osx do
-  platform :osx, '10.7'
+  platform :osx, '10.9'
   link_with 'OS X Tests'
   import_pods
 end
