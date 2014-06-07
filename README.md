@@ -1,6 +1,11 @@
 # FMDBMigrationManager
 
-A migration management system for [FMDB](https://github.com/ccgus/fmdb).
+[![Build Status](https://travis-ci.org/layerhq/FMDBMigrationManager.png?branch=master)](https://travis-ci.org/layerhq/FMDBMigrationManager)
+[![Pod Version](http://img.shields.io/cocoapods/v/FMDBMigrationManager.svg?style=flat)](http://cocoadocs.org/docsets/FMDBMigrationManager/)
+[![Pod Platform](http://img.shields.io/cocoapods/p/FMDBMigrationManager.svg?style=flat)](http://cocoadocs.org/docsets/FMDBMigrationManager/)
+[![Pod License](http://img.shields.io/cocoapods/l/FMDBMigrationManager.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0.html)
+
+**A SQLite schema migration management system for [FMDB](https://github.com/ccgus/fmdb).**
 
 ## Features
 
