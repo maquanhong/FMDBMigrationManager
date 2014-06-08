@@ -252,6 +252,19 @@ static FMDatabase *FMDatabaseWithSchemaMigrationsTable()
     expect(manager.currentVersion).to.equal(201499000000000);
 }
 
+- (void)testMigratingInMemoryDatabaseToLatestVersion
+{
+    FMDatabase *database = [FMDatabase databaseWithPath:nil];
+    FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabase:database migrationsBundle:FMDBMigrationsTestBundle()];
+    expect(manager.hasMigrationsTable).to.beFalsy();
+    NSError *error = nil;
+    BOOL success = [manager migrateDatabaseToVersion:UINT64_MAX progress:nil error:&error];
+    expect(success).to.beTruthy();
+    expect(error).to.beNil();
+    expect(manager.hasMigrationsTable).to.beTruthy();
+    expect(manager.currentVersion).to.equal(201499000000000);
+}
+
 - (void)testMigratingNewDatabaseToSpecificVersion
 {
     FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:FMDBRandomDatabasePath() migrationsBundle:FMDBMigrationsTestBundle()];

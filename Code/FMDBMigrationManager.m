@@ -49,16 +49,22 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 
 + (instancetype)managerWithDatabaseAtPath:(NSString *)path migrationsBundle:(NSBundle *)bundle
 {
-    return [[self alloc] initWithDatabasePath:path migrationsBundle:bundle];
+    FMDatabase *database = [FMDatabase databaseWithPath:path];
+    return [[self alloc] initWithDatabase:database migrationsBundle:bundle];
 }
 
-- (id)initWithDatabasePath:(NSString *)databasePath migrationsBundle:(NSBundle *)migrationsBundle
++ (instancetype)managerWithDatabase:(FMDatabase *)database migrationsBundle:(NSBundle *)bundle
+{
+    return [[self alloc] initWithDatabase:database migrationsBundle:bundle];
+}
+
+// Designated initializer
+- (id)initWithDatabase:(FMDatabase *)database migrationsBundle:(NSBundle *)migrationsBundle
 {
     self = [super init];
     if (self) {
-        _databasePath = databasePath;
+        _database = database;
         _migrationsBundle = migrationsBundle;
-        _database = [FMDatabase databaseWithPath:databasePath];
         [_database open];
     }
     return self;
@@ -81,6 +87,11 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
         return [resultSet stringForColumn:@"name"] != nil;
     }
     return NO;
+}
+
+- (BOOL)needsMigration
+{
+    return [self.pendingVersions count] > 0;
 }
 
 - (BOOL)createMigrationsTable:(NSError **)error

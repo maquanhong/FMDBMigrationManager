@@ -13,8 +13,7 @@
 
 /**
  @abstract The `FMDBMigrationManager` class provides a simple, flexible interface for managing migrations for
- a SQLite database that is accessed via FMDB. 
- @discussion asdasdsds
+ a SQLite database that is accessed via FMDB.
  */
 @interface FMDBMigrationManager : NSObject
 
@@ -22,6 +21,20 @@
 /// @name Creating a Migration Manager
 ///-----------------------------------
 
+/**
+ @abstract Creates a new migration manager with a given database and migrations bundle.
+ @param database The database with which to initialize the migration manager.
+ @param bundle The bundle containing the migrations.
+ @return A new migration manager.
+ */
++ (instancetype)managerWithDatabase:(FMDatabase *)database migrationsBundle:(NSBundle *)bundle;
+
+/**
+ @abstract Creates a new migration manager with a database for the given database and migrations bundle.
+ @param path The path to a database with which to initialize the migration manager.
+ @param bundle The bundle containing the migrations.
+ @return A new migration manager.
+ */
 + (instancetype)managerWithDatabaseAtPath:(NSString *)path migrationsBundle:(NSBundle *)bundle;
 
 ///--------------------------------------------------
@@ -29,9 +42,9 @@
 ///--------------------------------------------------
 
 /**
- @abstract Returns the path to the database of the receiver.
+ @abstract Returns the database of the receiver.
  */
-@property (nonatomic, readonly) NSString *databasePath;
+@property (nonatomic, readonly) FMDatabase *database;
 
 /**
  @abstract Returns the migrations bundle for the receiver.
