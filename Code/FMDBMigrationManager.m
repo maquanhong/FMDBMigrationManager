@@ -80,6 +80,8 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 // Designated initializer
 - (id)initWithDatabase:(FMDatabase *)database migrationsBundle:(NSBundle *)migrationsBundle
 {
+    if (!database) [NSException raise:NSInvalidArgumentException format:@"Cannot initialize a `%@` with nil `database`.", [self className]];
+    if (!migrationsBundle) [NSException raise:NSInvalidArgumentException format:@"Cannot initialize a `%@` with nil `migrationsBundle`.", [self className]];
     self = [super init];
     if (self) {
         _database = database;
