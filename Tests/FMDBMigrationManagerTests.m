@@ -131,6 +131,35 @@ static FMDatabase *FMDatabaseWithSchemaMigrationsTable()
     expect(manager.hasMigrationsTable).to.beTruthy();
 }
 
+- (void)testThatNeedsMigrationIsTrueIfMigrationsTableDoesNotExist
+{
+    FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:nil migrationsBundle:FMDBMigrationsTestBundle()];
+    expect(manager.needsMigration).to.beTruthy();
+}
+
+- (void)testThatNeedsMigrationIsTrueIfDatabaseIsNotFullyMigrated
+{
+    FMDatabase *database = FMDatabaseWithSchemaMigrationsTable();
+    [database executeUpdate:@"INSERT INTO schema_migrations(version) VALUES (?)", @201406063106474];
+    [database executeUpdate:@"INSERT INTO schema_migrations(version) VALUES (?)", @201406063548463];
+    [database close];
+    
+    FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:database.databasePath migrationsBundle:FMDBMigrationsTestBundle()];
+    expect(manager.needsMigration).to.beTruthy();
+}
+
+- (void)testThatNeedsMigrationIsFalseIfDatabaseIsFullyMigrated
+{
+    FMDatabase *database = FMDatabaseWithSchemaMigrationsTable();
+    [database executeUpdate:@"INSERT INTO schema_migrations(version) VALUES (?)", @201406063106474];
+    [database executeUpdate:@"INSERT INTO schema_migrations(version) VALUES (?)", @201406063548463];
+    [database executeUpdate:@"INSERT INTO schema_migrations(version) VALUES (?)", @201499000000000];
+    [database close];
+    
+    FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:database.databasePath migrationsBundle:FMDBMigrationsTestBundle()];
+    expect(manager.needsMigration).to.beFalsy();
+}
+
 - (void)testGettingMigrations
 {
     FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:FMDBRandomDatabasePath() migrationsBundle:FMDBMigrationsTestBundle()];
@@ -228,7 +257,7 @@ static FMDatabase *FMDatabaseWithSchemaMigrationsTable()
 - (void)testNewDatabaseReturnsEmptyArrayForAppliedVersions
 {
     FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:FMDBRandomDatabasePath() migrationsBundle:FMDBMigrationsTestBundle()];
-    expect(manager.appliedVersions).to.beEmpty();
+    expect(manager.appliedVersions).to.beNil();
 }
 
 - (void)testAppliedVersionReturnsAllRowsFromTheSchemaMigrationsTable
@@ -248,7 +277,7 @@ static FMDatabase *FMDatabaseWithSchemaMigrationsTable()
     expect(manager.pendingVersions).to.equal(@[@201406063106474, @201406063548463, @201499000000000]);
 }
 
-- (void)testPendingVersionsForNonUpToDateMigration
+- (void)testPendingVersionsForNonUpToDateDatabase
 {
     FMDatabase *database = FMDatabaseWithSchemaMigrationsTable();
     [database executeUpdate:@"INSERT INTO schema_migrations(version) VALUES (?)", @201406063106474];
@@ -256,6 +285,18 @@ static FMDatabase *FMDatabaseWithSchemaMigrationsTable()
     
     FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:database.databasePath migrationsBundle:FMDBMigrationsTestBundle()];
     expect(manager.pendingVersions).to.equal(@[ @201406063548463, @201499000000000 ]);
+}
+
+- (void)testPendingVersionsFullyMigratedDatabase
+{
+    FMDatabase *database = FMDatabaseWithSchemaMigrationsTable();
+    [database executeUpdate:@"INSERT INTO schema_migrations(version) VALUES (?)", @201406063106474];
+    [database executeUpdate:@"INSERT INTO schema_migrations(version) VALUES (?)", @201406063548463];
+    [database executeUpdate:@"INSERT INTO schema_migrations(version) VALUES (?)", @201499000000000];
+    [database close];
+    
+    FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:database.databasePath migrationsBundle:FMDBMigrationsTestBundle()];
+    expect(manager.pendingVersions).to.beEmpty();
 }
 
 - (void)testMigratingNewDatabaseToLatestVersion

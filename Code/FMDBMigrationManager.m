@@ -115,7 +115,7 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 
 - (BOOL)needsMigration
 {
-    return [self.pendingVersions count] > 0;
+    return !self.hasMigrationsTable || [self.pendingVersions count] > 0;
 }
 
 - (BOOL)createMigrationsTable:(NSError **)error
@@ -127,6 +127,7 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 
 - (uint64_t)currentVersion
 {
+    if (!self.hasMigrationsTable) return 0;
     FMResultSet *resultSet = [self.database executeQuery:@"SELECT MAX(version) FROM schema_migrations"];
     if ([resultSet next]) {
         return [resultSet unsignedLongLongIntForColumnIndex:0];
@@ -136,6 +137,7 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 
 - (uint64_t)originVersion
 {
+    if (!self.hasMigrationsTable) return 0;
     FMResultSet *resultSet = [self.database executeQuery:@"SELECT MIN(version) FROM schema_migrations"];
     if ([resultSet next]) {
         return [resultSet unsignedLongLongIntForColumnIndex:0];
@@ -145,6 +147,8 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 
 - (NSArray *)appliedVersions
 {
+    if (!self.hasMigrationsTable) return nil;
+    
     NSMutableArray *versions = [NSMutableArray new];
     FMResultSet *resultSet = [self.database executeQuery:@"SELECT version FROM schema_migrations"];
     while ([resultSet next]) {
@@ -156,6 +160,8 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 
 - (NSArray *)pendingVersions
 {
+    if (!self.hasMigrationsTable) return [[self.migrations valueForKey:@"version"] sortedArrayUsingSelector:@selector(compare:)];
+    
     NSMutableArray *pendingVersions = [[[self migrations] valueForKey:@"version"] mutableCopy];
     [pendingVersions removeObjectsInArray:self.appliedVersions];
     return [pendingVersions sortedArrayUsingSelector:@selector(compare:)];
