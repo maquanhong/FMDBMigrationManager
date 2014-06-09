@@ -21,7 +21,13 @@
 #import "FMDBMigrationManager.h"
 #import <objc/runtime.h>
 
-static NSString *FMDBMigrationFilenameRegexString = @"^(\\d+)_?((?<=_)[\\w\\s-]+)?(?<!_)\\.sql$";
+// Public Constants
+NSString *const FMDBMigrationManagerErrorDomain = @"com.layer.FMDBMigrationManager.errors";
+NSString *const FMDBMigrationManagerProgressVersionUserInfoKey = @"version";
+NSString *const FMDBMigrationManagerProgressMigrationUserInfoKey = @"migration";
+
+// Private Constants
+static NSString *const FMDBMigrationFilenameRegexString = @"^(\\d+)_?((?<=_)[\\w\\s-]+)?(?<!_)\\.sql$";
 
 BOOL FMDBIsMigrationAtPath(NSString *path)
 {
@@ -194,27 +200,45 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 
 - (BOOL)migrateDatabaseToVersion:(uint64_t)version progress:(void (^)(NSProgress *progress))progressBlock error:(NSError **)error
 {
-    [self.database beginTransaction];
     BOOL success = YES;
     NSArray *pendingVersions = self.pendingVersions;
     NSProgress *progress = [NSProgress progressWithTotalUnitCount:[pendingVersions count]];
     for (NSNumber *migrationVersionNumber in pendingVersions) {
+        [self.database beginTransaction];
+        
         uint64_t migrationVersion = [migrationVersionNumber unsignedLongLongValue];
         if (migrationVersion > version) break;
         id<FMDBMigrating> migration = [self migrationForVersion:migrationVersion];
         success = [migration migrateDatabase:self.database error:error];
-        if (!success) break;
-        [self.database executeUpdate:@"INSERT INTO schema_migrations(version) VALUES (?)", @(migration.version)];
+        if (!success) {
+            [self.database rollback];
+            break;
+        }
+        success = [self.database executeUpdate:@"INSERT INTO schema_migrations(version) VALUES (?)", @(migration.version)];
+        if (!success) {
+            [self.database rollback];
+            break;
+        }
+        
+        // Emit progress tracking and check for cancellation
         progress.completedUnitCount++;
-        if (progressBlock) progressBlock(progress);
-        if (progress.cancelled) break;
+        if (progressBlock) {
+            [progress setUserInfoObject:@(migrationVersion) forKey:FMDBMigrationManagerProgressVersionUserInfoKey];
+            [progress setUserInfoObject:migration forKey:FMDBMigrationManagerProgressMigrationUserInfoKey];
+            progressBlock(progress);
+            if (progress.cancelled) {
+                success = NO;
+                
+                NSDictionary *userInfo = @{ NSLocalizedDescriptionKey: @"Migration was halted due to cancellation." };
+                if (error) *error = [NSError errorWithDomain:FMDBMigrationManagerErrorDomain code:FMDBMigrationManagerErrorMigrationCancelled userInfo:userInfo];
+                [self.database rollback];
+                break;
+            }
+        }
+        
+        [self.database commit];
     }
-    if (!success || progress.cancelled) {
-        [self.database rollback];
-        return NO;
-    }
-    [self.database commit];
-    return YES;
+    return success;
 }
 
 @end

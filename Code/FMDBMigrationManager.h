@@ -231,6 +231,33 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ @abstract The domain for errors created by `FMDBMigrationManager`.
+ */
+extern NSString *const FMDBMigrationManagerErrorDomain;
+
+/**
+ @abstract A key for an `NSNumber` object in the `userInfo` of an `NSProgress` object specifying the version 
+ that the database was just migrated to.
+ @see `migrateDatabase:error:`
+ */
+extern NSString *const FMDBMigrationManagerProgressVersionUserInfoKey;
+
+/**
+ @abstract A key for an `id<FMDBMigrating>` object in the `userInfo` of an `NSProgress` object that identifies
+ the migration that was just applied to the database.
+ @see `migrateDatabase:error:`
+ */
+extern NSString *const FMDBMigrationManagerProgressMigrationUserInfoKey;
+
+/**
+ @abstract Enumerates the errors returned by FMDBMigrationManager
+ */
+typedef NS_ENUM(NSUInteger, FMDBMigrationManagerError) {
+    /// Indicates that migration was halted due to cancellation
+    FMDBMigrationManagerErrorMigrationCancelled  = 1
+};
+
+/**
  @abstract Returns a Boolean value that indicates if the file at the given path is an FMDB Migration.
  @discussion This function evaluates the last path component of the input string against the regular expression `/\d{1,15}_.+sql$/`.
  @param path The path to inspect.

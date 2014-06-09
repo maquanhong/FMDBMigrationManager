@@ -295,6 +295,24 @@ static FMDatabase *FMDatabaseWithSchemaMigrationsTable()
     expect(manager.currentVersion).to.equal(201406063106474);
 }
 
+- (void)testThatMigrationCanBeCancelledViaProgressBlock
+{
+    FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:FMDBRandomDatabasePath() migrationsBundle:FMDBMigrationsTestBundle()];
+    expect(manager.hasMigrationsTable).to.beFalsy();
+    NSError *error = nil;
+    BOOL success = [manager migrateDatabaseToVersion:UINT64_MAX progress:^(NSProgress *progress) {
+        if ([progress.userInfo[@"version"] isEqualToNumber:@201406063548463]) {
+            [progress cancel];
+        }
+    } error:&error];
+    expect(success).to.beFalsy();
+    expect(error).notTo.beNil();
+    expect(error.domain).to.equal(FMDBMigrationManagerErrorDomain);
+    expect(error.code).to.equal(FMDBMigrationManagerErrorMigrationCancelled);
+    expect(manager.hasMigrationsTable).to.beTruthy();
+    expect(manager.currentVersion).to.equal(201406063106474);
+}
+
 - (void)testFMDBIsMigrationAtPath
 {
     expect(FMDBIsMigrationAtPath(@"1.sql")).to.beTruthy();
