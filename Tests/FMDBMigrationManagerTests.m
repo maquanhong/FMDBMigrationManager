@@ -109,10 +109,13 @@ static FMDatabase *FMDatabaseWithSchemaMigrationsTable()
 
 - (void)testThatMigrationManagerClosesDatabaseThatItOpened
 {
-    FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:nil migrationsBundle:FMDBMigrationsTestBundle()];
-    FMDatabase *database = manager.database;
-    expect(database.goodConnection).to.beTruthy();
-    manager = nil;
+    FMDatabase *database = nil;
+    @autoreleasepool { // Ensures dealloc on iOS
+        FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:nil migrationsBundle:FMDBMigrationsTestBundle()];
+        database = manager.database;
+        expect(database.goodConnection).to.beTruthy();
+        manager = nil;
+    }
     expect(database.goodConnection).to.beFalsy();
 }
 
