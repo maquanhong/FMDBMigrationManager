@@ -98,6 +98,24 @@ static FMDatabase *FMDatabaseWithSchemaMigrationsTable()
     }
 }
 
+- (void)testThatMigrationManagerDoesNotCloseExistingOpenDatabase
+{
+    FMDatabase *database = [FMDatabase databaseWithPath:nil];
+    [database open];
+    FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabase:database migrationsBundle:FMDBMigrationsTestBundle()];
+    manager = nil;
+    expect(database.goodConnection).to.beTruthy();
+}
+
+- (void)testThatMigrationManagerClosesDatabaseThatItOpened
+{
+    FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:nil migrationsBundle:FMDBMigrationsTestBundle()];
+    FMDatabase *database = manager.database;
+    expect(database.goodConnection).to.beTruthy();
+    manager = nil;
+    expect(database.goodConnection).to.beFalsy();
+}
+
 - (void)testHasMigrationTableWhenTableDoesntExist
 {
     FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:FMDBRandomDatabasePath() migrationsBundle:FMDBMigrationsTestBundle()];

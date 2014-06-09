@@ -55,6 +55,7 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 
 @interface FMDBMigrationManager ()
 @property (nonatomic, strong) FMDatabase *database;
+@property (nonatomic, assign) BOOL shouldCloseOnDealloc;
 @end
 
 @implementation FMDBMigrationManager
@@ -77,7 +78,10 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
     if (self) {
         _database = database;
         _migrationsBundle = migrationsBundle;
-        [_database open];
+        if (![database goodConnection]) {
+            self.shouldCloseOnDealloc = YES;
+            [database open];
+        }
     }
     return self;
 }
@@ -89,7 +93,7 @@ static NSArray *FMDBClassesConformingToProtocol(Protocol *protocol)
 
 - (void)dealloc
 {
-    [_database close];
+    if (self.shouldCloseOnDealloc) [_database close];
 }
 
 - (BOOL)hasMigrationsTable
