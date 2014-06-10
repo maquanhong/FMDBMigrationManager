@@ -16,7 +16,7 @@ SQLite and FMDB for persistence.
 * Supports the creation and management of a dedicated migrations table within the host database.
 * Applies migrations safely using SQLite transactions.
 * Basic migrations are implemented as flat SQL files with a naming convention that encodes the version and name.
-* Supports code migration implementations for performing object graph migrations not expressable as SQL.
+* Supports code migration implementations for performing object graph migrations not expressible as SQL.
 * Discovers code based migrations via Objective-C runtime introspection of protocol conformance.
 * Includes a lightweight, yet rich API for introspecting schema state.
 * Exposes the status of migrations in progress and supports cancellation of migration via `NSProgress`.
