@@ -47,7 +47,7 @@ an invocation of Ruby: `ruby -e "puts Time.now.strftime('%Y%m%d%M%S%3N').to_i"`.
 ### Migration Naming
 
 FMDBMigrationManager favors migrations that are expressed as flat SQL files. These files can then be included into the host project via any `NSBundle`. In order
-for FMDBMigrationManager to be able to identify migration files within the bundle and interet the version they represent, the filename must encode the versioning
+for FMDBMigrationManager to be able to identify migration files within the bundle and interest the version they represent, the filename must encode the versioning
 data and may optionally include a descriptive name for the migration. Migrations filenames are matched with a regular expression that will recognize filenames of
 the form: `(<Numeric Version Number>)_?(<Descriptive Name)?.sql`. The name is optional but if included must be delimited by an underscore, but the version and the 
 .sql file extension are mandatory.
