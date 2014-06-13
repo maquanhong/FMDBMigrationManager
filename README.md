@@ -41,8 +41,8 @@ lines of development are brought together. Timestamps with sufficient levels of 
 sortable.
 
 The recommended format for timestamped migrations uses sub-second precision and can be generated via the `date` utility on platforms that provide GNU coreutils
-via `date +"%Y%m%d%M%S%3N"`. Unfortunately the build of `date` that ships with Mac OS X does not natively support this format. It can instead be generated via
-an invocation of Ruby: `ruby -e "puts Time.now.strftime('%Y%m%d%M%S%3N').to_i"`.
+via `date +"%Y%m%d%H%M%S%3N"`. Unfortunately the build of `date` that ships with Mac OS X does not natively support this format. It can instead be generated via
+an invocation of Ruby: `ruby -e "puts Time.now.strftime('%Y%m%d%H%M%S%3N').to_i"`.
 
 ### Migration Naming
 
