@@ -109,7 +109,7 @@ BOOL success = [manager createMigrationsTable:&error];
 ### Creating a SQL File Migration
 
 ```sh
-$ touch "`ruby -e "puts Time.now.strftime('%Y%m%d%M%S%3N').to_i"`"_CreateMyAwesomeTable.sql
+$ touch "`ruby -e "puts Time.now.strftime('%Y%m%d%H%M%S%3N').to_i"`"_CreateMyAwesomeTable.sql
 ```
 
 Now edit the file `*_CreateMyAwesomeTable.sql` in your editor of choice and add it to your application bundle.
